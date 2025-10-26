@@ -1,0 +1,249 @@
+/* SimpleBlogWebsite.jsx A single-file React component (default export) for a small blog-style website.
+
+How to use:
+
+This is a self-contained React component using Tailwind CSS classes.
+
+Add Tailwind to your project (recommended: create-react-app or Next.js with Tailwind configured).
+
+Import and render <SimpleBlogWebsite /> from your app entry (e.g., App.jsx).
+
+
+Features included:
+
+Responsive header with navigation
+
+Hero section
+
+Search and category filter for posts
+
+Post cards with images, excerpt, and read-more button
+
+Subscribe form (frontend-only)
+
+Footer
+
+
+Note: replace placeholder images and post content with your real data. */
+
+import React, { useState, useMemo } from "react";
+
+const samplePosts = [ { id: 1, title: "Mengenal Tailwind CSS: Cepat & Mudah", category: "Frontend", date: "2025-10-01", excerpt: "Cara cepat membuat UI responsif menggunakan utility-first classes dari Tailwind.", image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=80", }, { id: 2, title: "Panduan Menulis Blog yang Menarik", category: "Writing", date: "2025-09-18", excerpt: "Teknik penulisan, struktur artikel, dan tips SEO dasar untuk pemula.", image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1200&q=80", }, { id: 3, title: "Membangun Portofolio dengan React", category: "Frontend", date: "2025-08-05", excerpt: "Langkah-langkah membuat portofolio interaktif menggunakan React dan Vite.", image: "https://images.unsplash.com/photo-1508830524289-0adcbe822b40?w=1200&q=80", }, ];
+
+function Header({ onToggleMenu }) { return ( <header className="bg-white/80 backdrop-blur sticky top-0 z-40 shadow-sm"> <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between"> <div className="flex items-center gap-4"> <div className="font-bold text-xl">MyWebsite</div> <nav className="hidden md:flex gap-4 text-sm text-gray-700"> <a href="#home" className="hover:underline">Home</a> <a href="#blog" className="hover:underline">Blog</a> <a href="#about" className="hover:underline">About</a> <a href="#contact" className="hover:underline">Contact</a> </nav> </div> <div className="flex items-center gap-3"> <button className="hidden md:inline-block px-4 py-2 border rounded-lg text-sm">Login</button> <button
+onClick={onToggleMenu}
+className="md:hidden p-2 rounded-lg border"
+aria-label="menu"
+> ☰ </button> </div> </div> </header> ); }
+
+function Hero() { return ( <section id="home" className="bg-gradient-to-b from-sky-50 to-white"> <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-10 items-center"> <div> <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">Buat konten hebat, bagikan cerita.</h1> <p className="mt-4 text-gray-600">Template blog sederhana untuk menulis, membagikan, dan terhubung dengan pembaca Anda.</p> <div className="mt-6 flex gap-3"> <a href="#blog" className="px-5 py-3 bg-sky-600 text-white rounded-lg shadow">Jelajahi Blog</a> <a href="#about" className="px-5 py-3 border rounded-lg">Tentang</a> </div> </div> <div className="flex justify-center"> <div className="w-full max-w-md rounded-xl overflow-hidden shadow-lg"> <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80" alt="hero" className="w-full h-64 object-cover" /> </div> </div> </div> </section> ); }
+
+function PostCard({ post }) { return ( <article className="bg-white rounded-2xl shadow-sm overflow-hidden border"> <img src={post.image} alt={post.title} className="w-full h-44 object-cover" /> <div className="p-4"> <div className="text-xs text-gray-500">{post.category} • {post.date}</div> <h3 className="mt-2 font-semibold text-lg">{post.title}</h3> <p className="mt-2 text-gray-600 text-sm">{post.excerpt}</p> <div className="mt-4 flex items-center justify-between"> <a href="#" className="text-sm font-medium underline">Baca selengkapnya</a> <button className="text-sm px-3 py-1 border rounded-lg">Share</button> </div> </div> </article> ); }
+
+export default function SimpleBlogWebsite() { const [query, setQuery] = useState(""); const [category, setCategory] = useState("All"); const [subscribed, setSubscribed] = useState(false);
+
+const categories = useMemo(() => ["All", ...Array.from(new Set(samplePosts.map(p => p.category)))], []);
+
+const filtered = useMemo(() => { return samplePosts.filter(p => { const matchesQuery = (p.title + p.excerpt + p.category).toLowerCase().includes(query.toLowerCase()); const matchesCategory = category === "All" || p.category === category; return matchesQuery && matchesCategory; }); }, [query, category]);
+
+function handleSubscribe(e) { e.preventDefault(); setSubscribed(true); }
+
+return ( <div className="min-h-screen bg-gray-50 text-gray-800"> <Header onToggleMenu={() => alert("Toggle mobile menu — implement as needed.")} />
+
+<main>
+    <Hero />
+
+    <section id="blog" className="max-w-6xl mx-auto px-6 py-12">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h2 className="text-2xl font-bold">Artikel Terbaru</h2>
+        <div className="flex items-center gap-3">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Cari artikel..."
+            className="px-3 py-2 border rounded-lg text-sm"
+          />
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="px-3 py-2 border rounded-lg text-sm">
+            {categories.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtered.map(p => (
+          <PostCard key={p.id} post={p} />
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="mt-8 text-center text-gray-500">Tidak ada artikel yang cocok.</div>
+      )}
+    </section>
+
+    <section id="subscribe" className="bg-white border-t py-12">
+      <div className="max-w-3xl mx-auto px-6 text-center">
+        <h3 className="text-xl font-semibold">Langganan newsletter</h3>
+        {!subscribed ? (
+          <form onSubmit={handleSubscribe} className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+            <input required type="email" placeholder="Email kamu" className="px-4 py-3 border rounded-lg w-full sm:w-auto" />
+            <button type="submit" className="px-5 py-3 bg-sky-600 text-white rounded-lg">Subscribe</button>
+          </form>
+        ) : (
+          <div className="mt-4 text-green-600">Terima kasih! Email Anda sudah didaftarkan.</div>
+        )}
+      </div>
+    </section>
+
+    <section id="about" className="max-w-6xl mx-auto px-6 py-12">
+      <div className="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 className="text-2xl font-bold">Tentang Saya</h3>
+          <p className="mt-4 text-gray-600">Ini contoh situs blog yang sederhana. Sesuaikan gaya, struktur, dan kontennya sesuai kebutuhanmu.</p>
+          <p className="mt-2 text-gray-600">Butuh integrasi CMS, komentar, atau optimasi SEO? Saya bisa bantu.</p>
+        </div>
+        <div>
+          <div className="rounded-xl overflow-hidden shadow"><img src="https://images.unsplash.com/photo-1520719627571-5b2f4c3b0c2b?w=1200&q=80" alt="about" className="w-full h-56 object-cover"/></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer className="mt-12 bg-white border-t">
+    <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between">
+      <div className="text-sm text-gray-600">© {new Date().getFullYear()} MyWebsite. All rights reserved.</div>
+      <div className="flex gap-4 mt-4 md:mt-0">
+        <a href="#" className="text-sm">Privacy</a>
+        <a href="#" className="text-sm">Terms</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+); }/* SimpleBlogWebsite.jsx A single-file React component (default export) for a small blog-style website.
+
+How to use:
+
+This is a self-contained React component using Tailwind CSS classes.
+
+Add Tailwind to your project (recommended: create-react-app or Next.js with Tailwind configured).
+
+Import and render <SimpleBlogWebsite /> from your app entry (e.g., App.jsx).
+
+
+Features included:
+
+Responsive header with navigation
+
+Hero section
+
+Search and category filter for posts
+
+Post cards with images, excerpt, and read-more button
+
+Subscribe form (frontend-only)
+
+Footer
+
+
+Note: replace placeholder images and post content with your real data. */
+
+import React, { useState, useMemo } from "react";
+
+const samplePosts = [ { id: 1, title: "Mengenal Tailwind CSS: Cepat & Mudah", category: "Frontend", date: "2025-10-01", excerpt: "Cara cepat membuat UI responsif menggunakan utility-first classes dari Tailwind.", image: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=80", }, { id: 2, title: "Panduan Menulis Blog yang Menarik", category: "Writing", date: "2025-09-18", excerpt: "Teknik penulisan, struktur artikel, dan tips SEO dasar untuk pemula.", image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1200&q=80", }, { id: 3, title: "Membangun Portofolio dengan React", category: "Frontend", date: "2025-08-05", excerpt: "Langkah-langkah membuat portofolio interaktif menggunakan React dan Vite.", image: "https://images.unsplash.com/photo-1508830524289-0adcbe822b40?w=1200&q=80", }, ];
+
+function Header({ onToggleMenu }) { return ( <header className="bg-white/80 backdrop-blur sticky top-0 z-40 shadow-sm"> <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between"> <div className="flex items-center gap-4"> <div className="font-bold text-xl">MyWebsite</div> <nav className="hidden md:flex gap-4 text-sm text-gray-700"> <a href="#home" className="hover:underline">Home</a> <a href="#blog" className="hover:underline">Blog</a> <a href="#about" className="hover:underline">About</a> <a href="#contact" className="hover:underline">Contact</a> </nav> </div> <div className="flex items-center gap-3"> <button className="hidden md:inline-block px-4 py-2 border rounded-lg text-sm">Login</button> <button
+onClick={onToggleMenu}
+className="md:hidden p-2 rounded-lg border"
+aria-label="menu"
+> ☰ </button> </div> </div> </header> ); }
+
+function Hero() { return ( <section id="home" className="bg-gradient-to-b from-sky-50 to-white"> <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-10 items-center"> <div> <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">Buat konten hebat, bagikan cerita.</h1> <p className="mt-4 text-gray-600">Template blog sederhana untuk menulis, membagikan, dan terhubung dengan pembaca Anda.</p> <div className="mt-6 flex gap-3"> <a href="#blog" className="px-5 py-3 bg-sky-600 text-white rounded-lg shadow">Jelajahi Blog</a> <a href="#about" className="px-5 py-3 border rounded-lg">Tentang</a> </div> </div> <div className="flex justify-center"> <div className="w-full max-w-md rounded-xl overflow-hidden shadow-lg"> <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&q=80" alt="hero" className="w-full h-64 object-cover" /> </div> </div> </div> </section> ); }
+
+function PostCard({ post }) { return ( <article className="bg-white rounded-2xl shadow-sm overflow-hidden border"> <img src={post.image} alt={post.title} className="w-full h-44 object-cover" /> <div className="p-4"> <div className="text-xs text-gray-500">{post.category} • {post.date}</div> <h3 className="mt-2 font-semibold text-lg">{post.title}</h3> <p className="mt-2 text-gray-600 text-sm">{post.excerpt}</p> <div className="mt-4 flex items-center justify-between"> <a href="#" className="text-sm font-medium underline">Baca selengkapnya</a> <button className="text-sm px-3 py-1 border rounded-lg">Share</button> </div> </div> </article> ); }
+
+export default function SimpleBlogWebsite() { const [query, setQuery] = useState(""); const [category, setCategory] = useState("All"); const [subscribed, setSubscribed] = useState(false);
+
+const categories = useMemo(() => ["All", ...Array.from(new Set(samplePosts.map(p => p.category)))], []);
+
+const filtered = useMemo(() => { return samplePosts.filter(p => { const matchesQuery = (p.title + p.excerpt + p.category).toLowerCase().includes(query.toLowerCase()); const matchesCategory = category === "All" || p.category === category; return matchesQuery && matchesCategory; }); }, [query, category]);
+
+function handleSubscribe(e) { e.preventDefault(); setSubscribed(true); }
+
+return ( <div className="min-h-screen bg-gray-50 text-gray-800"> <Header onToggleMenu={() => alert("Toggle mobile menu — implement as needed.")} />
+
+<main>
+    <Hero />
+
+    <section id="blog" className="max-w-6xl mx-auto px-6 py-12">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h2 className="text-2xl font-bold">Artikel Terbaru</h2>
+        <div className="flex items-center gap-3">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Cari artikel..."
+            className="px-3 py-2 border rounded-lg text-sm"
+          />
+          <select value={category} onChange={(e) => setCategory(e.target.value)} className="px-3 py-2 border rounded-lg text-sm">
+            {categories.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtered.map(p => (
+          <PostCard key={p.id} post={p} />
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <div className="mt-8 text-center text-gray-500">Tidak ada artikel yang cocok.</div>
+      )}
+    </section>
+
+    <section id="subscribe" className="bg-white border-t py-12">
+      <div className="max-w-3xl mx-auto px-6 text-center">
+        <h3 className="text-xl font-semibold">Langganan newsletter</h3>
+        {!subscribed ? (
+          <form onSubmit={handleSubscribe} className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+            <input required type="email" placeholder="Email kamu" className="px-4 py-3 border rounded-lg w-full sm:w-auto" />
+            <button type="submit" className="px-5 py-3 bg-sky-600 text-white rounded-lg">Subscribe</button>
+          </form>
+        ) : (
+          <div className="mt-4 text-green-600">Terima kasih! Email Anda sudah didaftarkan.</div>
+        )}
+      </div>
+    </section>
+
+    <section id="about" className="max-w-6xl mx-auto px-6 py-12">
+      <div className="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 className="text-2xl font-bold">Tentang Saya</h3>
+          <p className="mt-4 text-gray-600">Ini contoh situs blog yang sederhana. Sesuaikan gaya, struktur, dan kontennya sesuai kebutuhanmu.</p>
+          <p className="mt-2 text-gray-600">Butuh integrasi CMS, komentar, atau optimasi SEO? Saya bisa bantu.</p>
+        </div>
+        <div>
+          <div className="rounded-xl overflow-hidden shadow"><img src="https://images.unsplash.com/photo-1520719627571-5b2f4c3b0c2b?w=1200&q=80" alt="about" className="w-full h-56 object-cover"/></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer className="mt-12 bg-white border-t">
+    <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between">
+      <div className="text-sm text-gray-600">© {new Date().getFullYear()} MyWebsite. All rights reserved.</div>
+      <div className="flex gap-4 mt-4 md:mt-0">
+        <a href="#" className="text-sm">Privacy</a>
+        <a href="#" className="text-sm">Terms</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+); }
